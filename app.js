@@ -13,24 +13,37 @@ const connection = mysql.createConnection({
 connection.connect( (err) => {
     if (err) throw err;
     console.log('connected as id ' + connection.threadId);
-    viewTable("departments");
-    // addRow("departments", "Marketing");
+    // viewTable('departments');
+    addRow("employees", 
+        {
+            "first_name" : "p",
+            "last_name" : "diddy",
+            "role_id" : 2,
+            "manager_id" : 5
+        }
+    );
     // updateRow("departments", department_id, ["Marketing Team"]);
     // // ---
     // updateManager(employee_id, new_manager_id);
     // viewTeam(manager_id); // and join the employees that share that id
     // deleteRow(table, id);
     // viewBudget(department_id); //filter employess by department_id join roles matching at role id sum salary
+    connection.end();
+
 });
   
 function viewTable(table) {
-    // SELECT * FROM profile WHERE age > ? AND color = ?
-    //   connection.query(`SELECT * FROM songs WHERE ? = ?`, (err, res) => {
-    connection.query("SELECT * FROM ?",[table], (err, res) => {
+    connection.query("SELECT * FROM ??;",[table], (err, res) => {
         if (err) throw err;
-        // console.log(res);
-        console.log(res[0].title);
-        
-        connection.end();
+        console.log(res);
+    });
+}
+function addRow(table, obj) {
+    let keys = Object.keys(obj);
+    let vals = keys.map((key) => obj[key]);
+
+    connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals], (err, res) => {
+        if (err) throw err;
+        console.log(`Added | ${vals.join(' | ')} | successfully!`);
     });
 }
