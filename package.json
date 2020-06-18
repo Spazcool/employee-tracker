@@ -17,5 +17,8 @@
     "inquirer": "^7.1.0",
     "mysql": "^2.18.1",
     "util": "^0.12.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
   }
 }
