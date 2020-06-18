@@ -6,46 +6,25 @@ class Query {
   }
 
   viewTable(table) {
+    // return this.connection.query("SELECT * FROM ?? ORDER BY id;",[table]);
     return this.connection.query("SELECT * FROM ??;",[table]);
   }
-
+// todo add validation, if row already exists
   addRow(table, obj) {
     let keys = Object.keys(obj);
     let vals = keys.map((key) => obj[key]);
-
+    console.log('getting this far?')
     return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
   }
 
   async updateRow(table, row, obj) {
     let keys = Object.keys(obj);
-    let vals = keys.map((key) => obj[key]);
-    let res = [];
+    let arr = keys.map((key) => {
+      let val = typeof obj[key] == 'string' ? `'${obj[key]}'`: obj[key];
+      return `${key}=${val}`;
+    }).join(',');
 
-// todo might not work with latency, might need to be async
-    keys.forEach(async (key) => {
-      let temp = await this.connection.query("UPDATE ?? SET ?? = ? WHERE id = ?;", [table, key, obj[key]]);
-      res.push(temp);
-    });
-    console.log(res)
-    // async function printFiles () {
-    //   const files = await getFilePaths();
-    
-    //   await Promise.all(files.map(async (file) => {
-    //     const contents = await fs.readFile(file, 'utf8')
-    //     console.log(contents)
-    //   }));
-    // }
-    // const start = async () => {
-    //   await asyncForEach(keys, async (num) => {
-    //     await waitFor(50);
-    //     console.log(num);
-    //   });
-    //   console.log('Done');
-    // }
-    // return res;
-    // this.connection.end();
-
-    // return `Updated | ${vals.join(' | ')} | successfully!`;
+    return this.connection.query(`UPDATE ?? SET ${arr} WHERE id = ?;`, [table, row]);
   }
 
   // TODO BONUS METHODS BELOW
