@@ -13,7 +13,6 @@ class Query {
   addRow(table, obj) {
     let keys = Object.keys(obj);
     let vals = keys.map((key) => obj[key]);
-    console.log('getting this far?')
     return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
   }
 
@@ -25,6 +24,8 @@ class Query {
     }).join(',');
 
     return this.connection.query(`UPDATE ?? SET ${arr} WHERE id = ?;`, [table, row]);
+    // return this.connection.query(`UPDATE ?? SET (?) WHERE id = ?;`, [table, obj, row]);
+
   }
 
   // TODO BONUS METHODS BELOW

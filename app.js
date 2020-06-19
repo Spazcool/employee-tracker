@@ -7,8 +7,8 @@ const database = new Query();
 const questions = new Questions();
 
 let newEmployee = {
-    "first_name" : "Madeline",
-    "last_name" : "Lamour",
+    "first_name" : "billy",
+    "last_name" : "the bob",
     "role_id" : 3,
     "manager_id" : 10
 };
@@ -28,7 +28,7 @@ let newRole = {
 //     console.table(response);
 // });
 
-// database.updateRow("employees", 11, newEmployee).then((response) => {
+// database.updateRow("employees", 10, newEmployee).then((response) => {
 //     console.log('UPDATE ROW:');
 //     console.log(response);
 // });
@@ -57,11 +57,34 @@ function init(){
             inquirer.prompt(questions.showActions())
                 .then((answers) => {
                     let { actions } = answers;
-                    let thing = actions.toLowerCase() + returnedTable;
-                    // console.log(thing)
-                    inquirer.prompt(questions[thing]())
-                        .then( (answers) => {
+                    let questionMethod = actions.toLowerCase() + returnedTable;
+                    console.log(questionMethod)
+                    inquirer.prompt(questions[questionMethod]())
+                        .then( async (answers) => {
+                            console.log(returnedTable);
                             console.log(answers)
+                            switch(actions.toLowerCase()){
+                                case 'add':
+                                    await database.addRow(returnedTable, answers);
+                                break;
+                                case 'update':
+                                    await database.updateRow(returnedTable, answers.id, answers);
+                                break;
+                                case 'delete':
+                                    await database.deleteRow(returnedTable, answers.id);
+                                break;
+                                default:
+                                    console.log('you shouldnt be here');
+                            }
+                            
+                            await database.viewTable(returnedTable.toLowerCase())
+                                .then((res) => {
+                                    console.log('\n');
+                                    console.table(res);
+                                    console.log('\n');
+                                });
+                        }).then(async ()=>{
+                           await init();
                         })
 
                     // if(answers.actions == 'Add'){
