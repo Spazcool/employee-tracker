@@ -10,13 +10,29 @@ function init(){
 // MAIN MENU / SELECT A TABLE
     inquirer.prompt(questions.showMenu())
     .then(async (answers) => {
-        await database.viewTable(answers.tables.toLowerCase())
-        .then((res) => {
-            console.log('\n');
-            console.table(res);
-            console.log('\n');
-        });
-        return answers.tables;
+        if(answers.tables === 'Team'){
+            return inquirer.prompt(questions.showTeam())
+            .then(async (answers) => {
+
+                await database.viewTeam(answers.name)
+                .then((res) => {
+                    console.log('\n');
+                    console.table(res);
+                    console.log('\n');
+                })
+            })
+            .then(() => {
+                init();
+            })
+        }else{
+            await database.viewTable(answers.tables.toLowerCase())
+            .then((res) => {
+                console.log('\n');
+                console.table(res);
+                console.log('\n');
+            });
+            return answers.tables;
+        }  
     })
 // SHOW AVAILABLE ACTIONS
     .then(async (returnedTable) => {
@@ -37,6 +53,7 @@ function init(){
                 switch(obj.dbAction.toLowerCase()){
                     case 'add':
                         await database.addRow(obj.table, answers);
+                        // await database.addRow(obj.table, answers).then(()=> obj);
                     break;
                     case 'update':
                         await database.updateRow(obj.table, answers.id, answers);
@@ -102,38 +119,3 @@ init();
 //     console.log('VIEW TABLE:');
 //     console.table(response);
 // });
-
-
-// -------------------------------
-// async function askQuestions(q){
-//     let obj = {};
-
-//     inquirer.prompt(q)
-//     .then((answers) => {
-//         obj = answers;
-//         obj.id = allEmployees.length + 1;
-
-//         inquirer.prompt(questions[obj.role.toLowerCase()])
-//         .then((answers) => {
-//             for(answer in answers){ //ADD ROLE SPECIFIC ATTRIBUTE TO OBJ
-//                 obj[answer] = answers[answer];
-//             }
-
-//             inquirer.prompt(questions.add)
-//             .then((answers) => {
-//                 allEmployees.push(obj);
-
-//                 if(answers.continue){
-//                     askQuestions(questions.common)
-//                 }else{
-//                     inquirer.prompt(questions.team)
-//                     .then((answers) => {
-//                         let teamName = answers.team ? answers.team : 'My Team';  
-//                         let team = buildTeamObjs(allEmployees);
-//                         writeToFile(render(team, teamName), teamName.replace(/\s/g, "").toLowerCase());
-//                     }) 
-//                 }
-//             })
-//         })
-//     })
-// }

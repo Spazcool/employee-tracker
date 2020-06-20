@@ -16,9 +16,7 @@ class Query {
     let keys = Object.keys(obj).filter((key) => obj[key] != '' && filters.includes(key));
     let vals = keys.map((key) => obj[key]);
     let where = keys.length > 1 ? `${keys[0]}='${vals[0]}' AND ${keys[1]}='${vals[1]}'` : `${keys[0]}='${vals[0]}'`;
-    // console.log(keys)
-    // console.log(vals)
-    // console.log(where)
+
     // todo select from table where title, name already exist should work
     // todo select from tabel where both first and lastnme exist needs to be figured out
   //   let thing = this.connection.query(`SELECT * FROM ?? WHERE ${where};`,[table]);
@@ -28,17 +26,23 @@ class Query {
    return this.connection.query(`SELECT * FROM ?? WHERE ${where};`,[table]);
   }
 
+  viewTeam(id){
+    return this.connection.query(`SELECT * FROM Employees WHERE manager_id = ?;`, [id]);
+  }
+
   addRow(table, obj) {
     let keys = Object.keys(obj).filter((key) => obj[key] != '');
     let vals = keys.map((key) => obj[key]);
 // todo add validation, if row already exists
-    this.viewRow(table, obj).then( (res) =>  {
-      if(res){
-        // todo give them an option to do it anyway
-        console.log( `${table.substr(0, table.length - 1)} already exists`);
-      }
-      return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
-    })
+    // this.viewRow(table, obj).then( (res) =>  {
+    //   if(res){
+    //     // todo give them an option to do it anyway
+    //     console.log( `${table.substr(0, table.length - 1)} already exists`);
+    //   }
+    //   return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
+    // })
+    return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
+
   }
 
   updateRow(table, id, obj) {
@@ -50,6 +54,11 @@ class Query {
 
       // todo update relations
     // if manager
+    this.viewTeam(id).then((res) => {
+      // returns emloyees related to manager
+      console.log(res)
+    });
+
     // query whole table, check for parent ids (manager)
     // update users with manager id to == new id
     // update manager 

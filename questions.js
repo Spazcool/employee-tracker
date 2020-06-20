@@ -1,25 +1,14 @@
 class Questions {
     constructor() {
     }
-// load
-//     list options
-//         employees
-//         depatartments
-//         roles
-//             view ^
-//                 view actions
-//                     add
-//                     update
-//                     delete
-//                     return to main menu
-//                         run ^ & view again
+
     showMenu(){
         return [
             {
                 type: 'list',
                 name: 'tables',
-                message: 'Which table would you like to view?',
-                choices: ['Employees', 'Departments', 'Roles']
+                message: 'Which would you like to view?',
+                choices: ['Employees', 'Departments', 'Roles', 'Team']
             }
         ]
     }
@@ -33,7 +22,18 @@ class Questions {
                 choices: ["Add", "Update", "Delete", "Return to Menu"]
             }
         ]
-    } 
+    }
+
+    showTeam(){
+        return [
+            {
+                type : 'input',
+                name : 'manager_id',
+                message : 'Manager ID:',
+                validate: (input) => this.validInt(input)
+            }
+        ]
+    }
 // ----------- ADD --------------
     addEmployees(){ 
         return [
@@ -41,27 +41,27 @@ class Questions {
                 type: 'input',
                 name: 'first_name',
                 message: 'First Name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
                 type: 'input',
                 name: 'last_name',
                 message: 'Last Name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
 // todo show role list?
                 type: 'input',
                 name: 'role_id',
                 message: 'Role ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
 // todo show manager list?
                 type: 'input',
                 name: 'manager_id',
                 message: 'Manager ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validOptionalInt(input)
             }
         ]
     }
@@ -72,19 +72,19 @@ class Questions {
                 type: 'input',
                 name: 'title',
                 message: 'Role title:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
                 type: 'input',
                 name: 'salary',
                 message: 'Role salary:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
                 type: 'input',
                 name: 'department_id',
                 message: 'Department ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             }
         ]
     }
@@ -95,7 +95,7 @@ class Questions {
                 type: 'input',
                 name: 'name',
                 message: 'Department name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             }
         ]
     }
@@ -107,34 +107,34 @@ class Questions {
                 type: 'input',
                 name: 'id',
                 message: 'Employee ID: ',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             },
 // todo put the current value here
             {
                 type: 'input',
                 name: 'first_name',
                 message: 'First Name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
                 type: 'input',
                 name: 'last_name',
                 message: 'Last Name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
 // todo show role list?
                 type: 'input',
                 name: 'role_id',
                 message: 'Role ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
 // todo show manager list?
                 type: 'input',
                 name: 'manager_id',
                 message: 'Manager ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validOptionalInt(input)
             }
         ]
     }
@@ -146,25 +146,25 @@ class Questions {
                 type: 'input',
                 name: 'id',
                 message: 'Role ID:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
                 type: 'input',
                 name: 'title',
                 message: 'Role title:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             },
             {
                 type: 'input',
                 name: 'salary',
                 message: 'Role salary:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
                 type: 'input',
                 name: 'department_id',
                 message: 'Department ID:',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             }
         ]
     }
@@ -176,13 +176,13 @@ class Questions {
                 type: 'input',
                 name: 'id',
                 message: 'Department ID:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validInt(input)
             },
             {
                 type: 'input',
                 name: 'name',
                 message: 'Department name:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validString(input)
             }
         ]
     }
@@ -194,7 +194,7 @@ class Questions {
                 type: 'input',
                 name: 'id',
                 message: 'Employee ID: ',
-                // validate: this.validInt(input, name)
+                validate: (input) => this.validInt(input)
             }
         ]
     }
@@ -206,7 +206,7 @@ class Questions {
                 type: 'input',
                 name: 'id',
                 message: 'Role ID:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validInt(input)
             }
         ]
     }
@@ -214,34 +214,29 @@ class Questions {
     deleteDepartments(){
         return [
 // todo show list of currently used ids
+// todo add confirmation
             {
                 type: 'input',
                 name: 'id',
                 message: 'Department ID:',
-                // validate: this.validString(input, name)
+                validate: (input) => this.validInt(input)
             }
         ]
     }
 
+// ----------- HELPERS --------------
+    validString(str){
+        return str.length > 0 ? true : `Must inlude a value.`;
+    }
 
+    validInt(int){
+        return Number.isInteger(parseInt(int)) === true ? true : `Must inlude an integer value`;
+    }
 
-
-
-    // validString(str, placeholder){
-    // return str.lentgth > 0 ? true : `Must inlude ${placeholder}`;
-    // if(str.length > 0){
-    //     return true;
-    // }
-    // return `Must inlude ${placeholder}`;
-    // }
-
-    // validInt(int, placeholder){
-    // return typeof int === "number" ? true : `Must inlude ${placeholder}`;
-    // if(typeof int === "number"){
-    //     return true;
-    // }
-    // return `Must inlude ${placeholder}`;
-    // }
+    validOptionalInt(int){
+        if(Number.isInteger(parseInt(int)) || int == '') return true;
+        else return 'Must be an integer value.'
+    }
 };
 
 module.exports = Questions;
