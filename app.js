@@ -6,22 +6,87 @@ const Questions = require('./questions.js');
 const database = new Query();
 const questions = new Questions();
 
-let newEmployee = {
-    "first_name" : "billy",
-    "last_name" : "the bob",
-    "role_id" : 3,
-    "manager_id" : 10
-};
+function init(){
+// MAIN MENU / SELECT A TABLE
+    inquirer.prompt(questions.showMenu())
+    .then(async (answers) => {
+        await database.viewTable(answers.tables.toLowerCase())
+        .then((res) => {
+            console.log('\n');
+            console.table(res);
+            console.log('\n');
+        });
+        return answers.tables;
+    })
+// SHOW AVAILABLE ACTIONS
+    .then(async (returnedTable) => {
+        return inquirer.prompt(questions.showActions())
+        .then( (answers) => {
+            return {
+                qAction : answers.actions == 'Return to Menu' ? 'showMenu' : answers.actions.toLowerCase() + returnedTable,
+                dbAction : answers.actions, 
+                table : returnedTable
+            };
+        });
+    })
+// APPLY ACTION TO DB
+    .then((obj) => {
+        if(obj.qAction !== 'showMenu'){
+            return inquirer.prompt(questions[obj.qAction]())
+            .then( async (answers) => {
+                switch(obj.dbAction.toLowerCase()){
+                    case 'add':
+                        await database.addRow(obj.table, answers);
+                    break;
+                    case 'update':
+                        await database.updateRow(obj.table, answers.id, answers);
+                    break;
+                    case 'delete':
+                        await database.deleteRow(obj.table, answers.id);
+                    break;
+                    default:
+                }
+                return obj;
+            })
+        }
+    })
+// SHOW CHANGES MADE TO DB
+    .then(async (obj) => {
+        if(obj){
+            await database.viewTable(obj.table.toLowerCase())
+            .then((res) => {
+                console.log('\n');
+                console.table(res);
+                console.log('\n');
+            });
+        }
+    })
+// SHOW MAIN MENU
+    .then(() => {
+        init();
+    })
+}
 
-let newDep = {
-    "name" : 'fuck it inc dose'
-};
+init();
 
-let newRole = {
-    "title" : "paperwork donkey", 
-    "salary" : 3.50, 
-    "department_id" : 2
-};
+// ----------------------------------------------------------
+
+// let newEmployee = {
+//     "first_name" : "billy",
+//     "last_name" : "the bob",
+//     "role_id" : 3,
+//     "manager_id" : 10
+// };
+
+// let newDep = {
+//     "name" : 'fuck it inc dose'
+// };
+
+// let newRole = {
+//     "title" : "paperwork donkey", 
+//     "salary" : 3.50, 
+//     "department_id" : 2
+// };
 
 // database.addRow('roles', newRole).then((response) => {
 //     console.log('ADD ROW:');
@@ -39,90 +104,7 @@ let newRole = {
 // });
 
 
-function init(){
-    // showmenu
-    // got to table
-    // show actions
-    // do action
-    // show actions
-
-    // let table = '';
-    // MAIN MENU / SELECT A TABLE
-    inquirer.prompt(questions.showMenu())
-        .then(async (answers) => {
-            // table = answers.tables;
-            await database.viewTable(answers.tables.toLowerCase())
-                .then((res) => {
-                    console.log('\n');
-                    console.table(res);
-                    console.log('\n');
-                });
-                return answers.tables;
-        })
-        .then((returnedTable) => {
-
-    // LIST ACTIONS TO BE PERFOMRED ON TABLE
-            inquirer.prompt(questions.showActions())
-                .then((answers) => {
-                    let { actions } = answers;
-                    let questionMethod = actions == 'Return to Menu' ? 'showMenu' :actions.toLowerCase() + returnedTable;
-                  
-                    // console.log(actions)
-                    // // showMainMenu
-                    // // showActions
-                    // let questionMethod = actions.toLowerCase() + returnedTable;
-                    console.log(questionMethod)
-                })
-        
-                
-                    inquirer.prompt(questions[questionMethod]())
-                        .then( async (answers) => {
-                            // console.log(returnedTable);
-                            console.log(answers)
-                            console.log(actions)
-                            switch(actions.toLowerCase()){
-                                case 'add':
-                                    await database.addRow(returnedTable, answers);
-                                break;
-                                case 'update':
-                                    await database.updateRow(returnedTable, answers.id, answers);
-                                break;
-                                case 'delete':
-                                    await database.deleteRow(returnedTable, answers.id);
-                                break;
-                                default:
-                                    // console.log('you shouldnt be here');
-                            }
-                            // todo move this to another then, i think its gettin gcalled before the others have finsiehd
-
-                            await database.viewTable(returnedTable.toLowerCase())
-                                .then((res) => {
-                                    console.log('\n');
-                                    console.table(res);
-                                    console.log('\n');
-                                });
-                        }).then(async ()=>{
-                            console.log('falling down')
-                           await init();
-                        })
-
-                    // if(answers.actions == 'Add'){
-                    //     inquirer.prompt(questions[actions.toLowerCase() + table])
-                    // }else if(answers.actions == 'Update'){
-
-                    // }else if(answers.actions == 'Delete'){
-
-                    // }else{
-                    //     init();
-                    // }
-                })
-        });  
-}
-
-init();
-
-// ----------------------------------------------------------
-
+// -------------------------------
 // async function askQuestions(q){
 //     let obj = {};
 
