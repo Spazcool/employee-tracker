@@ -13,7 +13,7 @@ class Questions {
 //                     delete
 //                     return to main menu
 //                         run ^ & view again
-    showMainMenu(){
+    showMenu(){
         return [
             {
                 type: 'list',

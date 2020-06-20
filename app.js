@@ -40,8 +40,15 @@ let newRole = {
 
 
 function init(){
+    // showmenu
+    // got to table
+    // show actions
+    // do action
+    // show actions
+
     // let table = '';
-    inquirer.prompt(questions.showMainMenu())
+    // MAIN MENU / SELECT A TABLE
+    inquirer.prompt(questions.showMenu())
         .then(async (answers) => {
             // table = answers.tables;
             await database.viewTable(answers.tables.toLowerCase())
@@ -53,16 +60,26 @@ function init(){
                 return answers.tables;
         })
         .then((returnedTable) => {
-            // console.log(thing)
+
+    // LIST ACTIONS TO BE PERFOMRED ON TABLE
             inquirer.prompt(questions.showActions())
                 .then((answers) => {
                     let { actions } = answers;
-                    let questionMethod = actions.toLowerCase() + returnedTable;
+                    let questionMethod = actions == 'Return to Menu' ? 'showMenu' :actions.toLowerCase() + returnedTable;
+                  
+                    // console.log(actions)
+                    // // showMainMenu
+                    // // showActions
+                    // let questionMethod = actions.toLowerCase() + returnedTable;
                     console.log(questionMethod)
+                })
+        
+                
                     inquirer.prompt(questions[questionMethod]())
                         .then( async (answers) => {
-                            console.log(returnedTable);
+                            // console.log(returnedTable);
                             console.log(answers)
+                            console.log(actions)
                             switch(actions.toLowerCase()){
                                 case 'add':
                                     await database.addRow(returnedTable, answers);
@@ -74,9 +91,10 @@ function init(){
                                     await database.deleteRow(returnedTable, answers.id);
                                 break;
                                 default:
-                                    console.log('you shouldnt be here');
+                                    // console.log('you shouldnt be here');
                             }
-                            
+                            // todo move this to another then, i think its gettin gcalled before the others have finsiehd
+
                             await database.viewTable(returnedTable.toLowerCase())
                                 .then((res) => {
                                     console.log('\n');
@@ -84,6 +102,7 @@ function init(){
                                     console.log('\n');
                                 });
                         }).then(async ()=>{
+                            console.log('falling down')
                            await init();
                         })
 
