@@ -36,22 +36,24 @@ class Query {
   viewTeam(id){
     return this.connection.query(`SELECT * FROM Employees WHERE manager_id = ?;`, [id]);
   }
-
-  async addRow(table, obj) {
-    // todo split this monster up into separate methods for each type of add
-    // for ex: roles, employess, departments
+// TO ELIAS OR MICHAEL, IM NOT PROUD OF THE FOLLOWING SPEGHETTI CODE BUT TIME WAS SHORT
+// AND GETTIGN IT TO WORK WAS MORE IMPORTANT THAN MAKING IT LOOK SEXY
+// ENJOY
+  async modRow(table, obj, update) {
     let originalKeys = Object.keys(obj).filter((key) => obj[key] != '');
-    let badkeys = ['role', 'department', 'manager', 'employee'];
+    let badkeys = ['role', 'roles', 'department', 'departments', 'manager', 'employee', 'names'];
+    let moddedKeys;
+    let vals;
 
     for(let key of originalKeys){
       for(let badkey of badkeys){
         if(key == badkey){
           let tabName;
           let sendObj = {};
-          if(badkey == 'role'){
+          if(badkey == 'role' || badkey == 'roles'){
             tabName = 'roles';
             sendObj.title = obj[badkey];
-          }else if(badkey == 'department'){
+          }else if(badkey == 'department' || badkey == 'departments'){
             tabName = 'departments';
             sendObj.name = obj[badkey];
           }else{
@@ -64,49 +66,68 @@ class Query {
               sendObj.first_name = ''
             }
           }
+         
           obj[`${key}_id`] = obj[badkey];
           delete obj[badkey];
 
           await this.viewRow(tabName, sendObj)
           .then((res) => {
               if(res[0]){
-                obj[`${key}_id`] = res[0].id;
+                if(`${key}_id` == 'names_id' || `${key}_id` == 'roles_id' || `${key}_id` == 'departments_id'){
+                  obj['id'] = obj[`${key}_id`];
+                  obj['id'] = res[0].id;
+                  delete obj[`${key}_id`];
+                }else{
+                  obj[`${key}_id`] = res[0].id;
+                }
               }else{
                 delete obj[`${key}_id`];
               }
-            })
+          })
         }  
       }
     }
-    let moddedKeys = Object.keys(obj);
-    let vals = moddedKeys.map((key) => obj[key]);
-    console.log('@@@@@@@@@')
-    console.log(obj);
-    console.log(moddedKeys)
+
+    moddedKeys = Object.keys(obj);
+    vals = moddedKeys.map((key) => obj[key]);
+
+    if(update){
+      let arr = moddedKeys.map((key) => {
+        let val = typeof obj[key] == 'string' ? `'${obj[key]}'`: obj[key];
+        return `${key}=${val}`;
+      }).join(',');
+     
+      return this.connection.query(`UPDATE ?? SET ${arr} WHERE id = ?;`, [table, obj.id]);
+    }
+
     return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, moddedKeys, vals]);
   }
 
-  updateRow(table, id, obj) {
-    let keys = Object.keys(obj);
-    let arr = keys.map((key) => {
-      let val = typeof obj[key] == 'string' ? `'${obj[key]}'`: obj[key];
-      return `${key}=${val}`;
-    }).join(',');
+  // updateRow(table, id, obj) {
+  //   console.log("update row")
+  //   let badkeys = ['role', 'department', 'manager', 'employee', 'names'];
 
-      // todo update relations
-    // if manager
-    this.viewTeam(id).then((res) => {
-      // returns emloyees related to manager
-      console.log(res)
-    });
+  //   console.log(table, id, obj)
+  //   let keys = Object.keys(obj);
+  //   let arr = keys.map((key) => {
+  //     let val = typeof obj[key] == 'string' ? `'${obj[key]}'`: obj[key];
+  //     return `${key}=${val}`;
+  //   }).join(',');
 
-    // query whole table, check for parent ids (manager)
-    // update users with manager id to == new id
-    // update manager 
+  //     // todo update relations
+  //   // if manager
+  //   // this.viewTeam(id).then((res) => {
+  //     // returns emloyees related to manager
+  //   //   console.log(res)
+  //   // });
 
-    return this.connection.query(`UPDATE ?? SET ${arr} WHERE id = ?;`, [table, id]);
-    // return this.connection.query(`UPDATE ?? SET (?) WHERE id = ?;`, [table, obj, row]);
-  }
+  //   // query whole table, check for parent ids (manager)
+  //   // update users with manager id to == new id
+  //   // update manager 
+
+  //   // return this.connection.query(`UPDATE ?? SET ${arr} WHERE id = ?;`, [table, id]);
+  //   // return this.connection.query(`UPDATE ?? SET (?) WHERE id = ?;`, [table, obj, row]);
+  // }
 
   deleteRow(table, id) {
     // todo delete relations

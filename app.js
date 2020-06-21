@@ -50,17 +50,12 @@ function init(){
         if(obj.qAction !== 'showMenu'){
             return inquirer.prompt(questions[obj.qAction]())
             .then( async (answers) => {
-                // console.log("@@@@@@@@")
-                // console.log(answers)
-                // console.log("@@@@@@@@")
-
                 switch(obj.dbAction.toLowerCase()){
                     case 'add':
-                        await database.addRow(obj.table, answers);
-                        // await database.addRow(obj.table, answers).then(()=> obj);
+                        await database.modRow(obj.table, answers, false);
                     break;
                     case 'update':
-                        await database.updateRow(obj.table, answers.id, answers);
+                        await database.modRow(obj.table, answers, true);
                     break;
                     case 'delete':
                         await database.deleteRow(obj.table, answers.id);
@@ -89,37 +84,3 @@ function init(){
 }
 
 init();
-
-// ----------------------------------------------------------
-
-// let newEmployee = {
-//     "first_name" : "billy",
-//     "last_name" : "the bob",
-//     "role_id" : 3,
-//     "manager_id" : 10
-// };
-
-// let newDep = {
-//     "name" : 'fuck it inc dose'
-// };
-
-// let newRole = {
-//     "title" : "paperwork donkey", 
-//     "salary" : 3.50, 
-//     "department_id" : 2
-// };
-
-// database.addRow('roles', newRole).then((response) => {
-//     console.log('ADD ROW:');
-//     console.table(response);
-// });
-
-// database.updateRow("employees", 10, newEmployee).then((response) => {
-//     console.log('UPDATE ROW:');
-//     console.log(response);
-// });
-
-// database.viewTable('employees').then((response) => {
-//     console.log('VIEW TABLE:');
-//     console.table(response);
-// });

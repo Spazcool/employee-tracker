@@ -108,12 +108,12 @@ class Questions {
     updateEmployees(){ 
         return [
             {
-                type: 'input',
-                name: 'id',
+                type: 'list',
+                name: 'names',
                 message: 'Employee: ',
                 choices: () => this.employeeList()
             },
-// todo put the current value here
+// todo put the chosen name value here
             {
                 type: 'input',
                 name: 'first_name',
@@ -145,7 +145,7 @@ class Questions {
         return [
             {
                 type: 'list',
-                name: 'id',
+                name: 'roles',
                 message: 'Role:',
                 choices: () => this.roleList()
             },
@@ -174,7 +174,7 @@ class Questions {
         return [
             {
                 type: 'list',
-                name: 'id',
+                name: 'departments',
                 message: 'Department:',
                 choices: () => this.departmentList()
             },
