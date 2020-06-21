@@ -11,21 +11,21 @@ function init(){
     inquirer.prompt(questions.showMenu())
     .then(async (answers) => {
         if(answers.tables === 'Team'){
-            return inquirer.prompt(questions.showTeam())
-            .then(async (answers) => {
+            // return inquirer.prompt(questions.showTeam())
+            // .then(async (answers) => {
 
-                await database.viewTeam(answers.name)
-                .then((res) => {
-                    console.log('\n');
-                    console.table(res);
-                    console.log('\n');
-                })
-            })
-            .then(() => {
-                init();
-            })
+            //     await database.viewTeam(answers.name)
+            //     .then((res) => {
+            //         console.log('\n');
+            //         console.table(res);
+            //         console.log('\n');
+            //     })
+            // })
+            // .then(() => {
+            //     init();
+            // })
         }else{
-            await database.viewTable(answers.tables.toLowerCase())
+            await database.viewCols(answers.tables.toLowerCase(), '*')
             .then((res) => {
                 console.log('\n');
                 console.table(res);
@@ -50,6 +50,10 @@ function init(){
         if(obj.qAction !== 'showMenu'){
             return inquirer.prompt(questions[obj.qAction]())
             .then( async (answers) => {
+                // console.log("@@@@@@@@")
+                // console.log(answers)
+                // console.log("@@@@@@@@")
+
                 switch(obj.dbAction.toLowerCase()){
                     case 'add':
                         await database.addRow(obj.table, answers);

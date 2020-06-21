@@ -1,6 +1,7 @@
+const Query = require('./db/query.js');
+const database = new Query();
+
 class Questions {
-    constructor() {
-    }
 
     showMenu(){
         return [
@@ -8,7 +9,9 @@ class Questions {
                 type: 'list',
                 name: 'tables',
                 message: 'Which would you like to view?',
-                choices: ['Employees', 'Departments', 'Roles', 'Team']
+                // choices: ['Employees', 'Departments', 'Roles', 'Team']
+                choices: ['Employees', 'Departments', 'Roles']
+
             }
         ]
     }
@@ -27,10 +30,14 @@ class Questions {
     showTeam(){
         return [
             {
-                type : 'input',
+                type : 'list',
                 name : 'manager_id',
-                message : 'Manager ID:',
-                validate: (input) => this.validInt(input)
+                message : 'Manager:',
+                choices: async () => database.viewCols('employees', ['first_name', 'last_name']).then((res) => {
+                    let managers = res.map((manager) => `${manager.first_name} ${manager.last_name}`)
+                    managers.push('-- N/A --');
+                    return managers
+                })
             }
         ]
     }
@@ -50,18 +57,16 @@ class Questions {
                 validate: (input) => this.validString(input)
             },
             {
-// todo show role list?
-                type: 'input',
-                name: 'role_id',
-                message: 'Role ID:',
-                validate: (input) => this.validInt(input)
+                type: 'list',
+                name: 'role',
+                message: 'Role:',
+                choices: () => this.roleList()
             },
             {
-// todo show manager list?
-                type: 'input',
-                name: 'manager_id',
-                message: 'Manager ID:',
-                validate: (input) => this.validOptionalInt(input)
+                type: 'list',
+                name: 'manager',
+                message: 'Manager:',
+                choices: () => this.managerList()            
             }
         ]
     }
@@ -81,10 +86,10 @@ class Questions {
                 validate: (input) => this.validInt(input)
             },
             {
-                type: 'input',
+                type: 'list',
                 name: 'department_id',
-                message: 'Department ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Department:',
+                choices: () => this.departmentList()
             }
         ]
     }
@@ -102,12 +107,11 @@ class Questions {
 // ----------- UPDATE --------------
     updateEmployees(){ 
         return [
-// todo show list of currently used ids
             {
                 type: 'input',
                 name: 'id',
-                message: 'Employee ID: ',
-                validate: (input) => this.validInt(input)
+                message: 'Employee: ',
+                choices: () => this.employeeList()
             },
 // todo put the current value here
             {
@@ -123,30 +127,27 @@ class Questions {
                 validate: (input) => this.validString(input)
             },
             {
-// todo show role list?
-                type: 'input',
+                type: 'list',
                 name: 'role_id',
-                message: 'Role ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Role:',
+                choices: () => this.roleList()           
             },
             {
-// todo show manager list?
-                type: 'input',
+                type: 'list',
                 name: 'manager_id',
-                message: 'Manager ID:',
-                validate: (input) => this.validOptionalInt(input)
+                message: 'Manager:',
+                choices: () => this.managerList()
             }
         ]
     }
 
     updateRoles(){
         return [
-// todo show list of currently used ids
             {
-                type: 'input',
+                type: 'list',
                 name: 'id',
                 message: 'Role ID:',
-                validate: (input) => this.validInt(input)
+                choices: () => this.roleList()
             },
             {
                 type: 'input',
@@ -161,22 +162,21 @@ class Questions {
                 validate: (input) => this.validInt(input)
             },
             {
-                type: 'input',
+                type: 'list',
                 name: 'department_id',
-                message: 'Department ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Department:',
+                choices: () => this.departmentList()
             }
         ]
     }
 
     updateDepartments(){
         return [
-// todo show list of currently used ids
             {
-                type: 'input',
+                type: 'list',
                 name: 'id',
-                message: 'Department ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Department:',
+                choices: () => this.departmentList()
             },
             {
                 type: 'input',
@@ -189,37 +189,34 @@ class Questions {
 // ----------- DELETE --------------
     deleteEmployees(){ 
         return [
-// todo show list of currently used ids
             {
-                type: 'input',
+                type: 'list',
                 name: 'id',
-                message: 'Employee ID: ',
-                validate: (input) => this.validInt(input)
+                message: 'Employee: ',
+                choices: () => this.employeeList()
             }
         ]
     }
 
     deleteRoles(){
         return [
-// todo show list of currently used ids
             {
-                type: 'input',
+                type: 'list',
                 name: 'id',
-                message: 'Role ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Role:',
+                choices: () => this.roleList()
             }
         ]
     }
 
     deleteDepartments(){
         return [
-// todo show list of currently used ids
 // todo add confirmation
             {
-                type: 'input',
+                type: 'list',
                 name: 'id',
-                message: 'Department ID:',
-                validate: (input) => this.validInt(input)
+                message: 'Department:',
+                choices: () => this.departmentList()
             }
         ]
     }
@@ -236,6 +233,45 @@ class Questions {
     validOptionalInt(int){
         if(Number.isInteger(parseInt(int)) || int == '') return true;
         else return 'Must be an integer value.'
+    }
+
+// ----------- DB CALLS --------------
+    managerList (){
+        return database.viewCols('employees', ['first_name', 'last_name', 'role_id'])
+        .then((res) => {
+            return database.viewCols('roles', ['id', 'title'])
+            .then((response) => {
+                let managerRole = response.filter((thing) => thing.title == 'Manager');
+                let managers = res.filter((employee) => employee.role_id === managerRole[0].id)
+                .map((manager) => `${manager.first_name} ${manager.last_name}`)
+                managers.push('-- N/A --');
+                return managers
+            })
+        })
+    }
+
+    roleList(){
+        return database.viewCols('roles', 'title')
+        .then((res) => {
+            let roles = res.map((role) => role.title)
+            return roles
+        })
+    }
+
+    departmentList(){
+        return database.viewCols('departments', 'name')
+        .then((res) => {
+            let depts = res.map((dept) => dept.name);
+            return depts;
+        })
+    }
+
+    employeeList(){
+        return database.viewCols('employees', ['first_name', 'last_name'])
+        .then((res) => {
+            let employees = res.map((employee) => `${employee.first_name} ${employee.last_name}`)
+            return employees
+        }) 
     }
 };
 

@@ -11,38 +11,79 @@ class Query {
     return this.connection.query("SELECT * FROM ??;",[table]);
   }
 
-  viewRow(table, obj){
-    let filters = ['title', 'first_name', 'last_name', 'name'];
-    let keys = Object.keys(obj).filter((key) => obj[key] != '' && filters.includes(key));
+  viewCols(table, arr) {
+    return this.connection.query("SELECT ?? FROM ??;",[arr, table]);
+  }
+
+  async viewRow(table, obj){
+    console.log('viewRow')
+    console.log(table, obj)
+    // let filters = ['title', 'first_name', 'last_name', 'name'];
+    // let keys = Object.keys(obj).filter((key) => obj[key] != '' && filters.includes(key));
+    let keys = Object.keys(obj)
     let vals = keys.map((key) => obj[key]);
     let where = keys.length > 1 ? `${keys[0]}='${vals[0]}' AND ${keys[1]}='${vals[1]}'` : `${keys[0]}='${vals[0]}'`;
-
     // todo select from table where title, name already exist should work
     // todo select from tabel where both first and lastnme exist needs to be figured out
   //   let thing = this.connection.query(`SELECT * FROM ?? WHERE ${where};`,[table]);
   //   thing.then((res) => {
   //     console.log("@@@@", res);
   // });
-   return this.connection.query(`SELECT * FROM ?? WHERE ${where};`,[table]);
+    console.log('wherer', where)
+    return this.connection.query(`SELECT * FROM ?? WHERE ${where};`,[table]);
   }
 
   viewTeam(id){
     return this.connection.query(`SELECT * FROM Employees WHERE manager_id = ?;`, [id]);
   }
 
-  addRow(table, obj) {
-    let keys = Object.keys(obj).filter((key) => obj[key] != '');
-    let vals = keys.map((key) => obj[key]);
-// todo add validation, if row already exists
-    // this.viewRow(table, obj).then( (res) =>  {
-    //   if(res){
-    //     // todo give them an option to do it anyway
-    //     console.log( `${table.substr(0, table.length - 1)} already exists`);
-    //   }
-    //   return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
-    // })
-    return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, keys, vals]);
+  async addRow(table, obj) {
+    // todo split this monster up into separate methods for each type of add
+    // for ex: roles, employess, departments
+    let originalKeys = Object.keys(obj).filter((key) => obj[key] != '');
+    let badkeys = ['role', 'department', 'manager', 'employee'];
 
+    for(let key of originalKeys){
+      for(let badkey of badkeys){
+        if(key == badkey){
+          let tabName;
+          let sendObj = {};
+          if(badkey == 'role'){
+            tabName = 'roles';
+            sendObj.title = obj[badkey];
+          }else if(badkey == 'department'){
+            tabName = 'departments';
+            sendObj.name = obj[badkey];
+          }else{
+            tabName = 'employees';
+            if(obj[badkey] !== '-- N/A --'){
+              let names = obj[badkey].split(" ");
+              sendObj.first_name = names[0];
+              sendObj.last_name = names[1];
+            }else{
+              sendObj.first_name = ''
+            }
+          }
+          obj[`${key}_id`] = obj[badkey];
+          delete obj[badkey];
+
+          await this.viewRow(tabName, sendObj)
+          .then((res) => {
+              if(res[0]){
+                obj[`${key}_id`] = res[0].id;
+              }else{
+                delete obj[`${key}_id`];
+              }
+            })
+        }  
+      }
+    }
+    let moddedKeys = Object.keys(obj);
+    let vals = moddedKeys.map((key) => obj[key]);
+    console.log('@@@@@@@@@')
+    console.log(obj);
+    console.log(moddedKeys)
+    return this.connection.query("INSERT INTO ?? (??) VALUES (?);", [table, moddedKeys, vals]);
   }
 
   updateRow(table, id, obj) {
