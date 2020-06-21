@@ -87,7 +87,7 @@ class Questions {
             },
             {
                 type: 'list',
-                name: 'department_id',
+                name: 'department',
                 message: 'Department:',
                 choices: () => this.departmentList()
             }
@@ -128,13 +128,13 @@ class Questions {
             },
             {
                 type: 'list',
-                name: 'role_id',
+                name: 'role',
                 message: 'Role:',
                 choices: () => this.roleList()           
             },
             {
                 type: 'list',
-                name: 'manager_id',
+                name: 'manager',
                 message: 'Manager:',
                 choices: () => this.managerList()
             }
@@ -146,7 +146,7 @@ class Questions {
             {
                 type: 'list',
                 name: 'id',
-                message: 'Role ID:',
+                message: 'Role:',
                 choices: () => this.roleList()
             },
             {
@@ -163,7 +163,7 @@ class Questions {
             },
             {
                 type: 'list',
-                name: 'department_id',
+                name: 'department',
                 message: 'Department:',
                 choices: () => this.departmentList()
             }
