@@ -2,7 +2,7 @@
 A CLI app to build & manage teams of employees. The application prompts the user for information about the various employees, their roles and departments; querying a MySQL database This app runs in a Node environment and leverages the Inquirer & MySQL packages.
 
 <p align="center">
-   <img width="80%" height="350vh" src="./Assets/desktop.gif"/>
+   <img width="60%" height="350vh" src="./Assets/desktop.gif"/>
 </p>
 
 ## Installation & Getting Started
