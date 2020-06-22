@@ -1,19 +1,19 @@
 const inquirer = require('inquirer');
 const { Table } = require('console-table-printer');
-const Query = require('./db/query.js');
-const Questions = require('./questions.js');
-const database = new Query();
+const DB = require('./config/db.js');
+const Questions = require('./config/questions.js');
+const database = new DB();
 const questions = new Questions();
 const colors = [
-'red',
-'green',
-'yellow',
-'white',
-'blue',
-'magenta',
-'cyan',
-'crimson',
-'white_bold'
+    'red',
+    'green',
+    'yellow',
+    'white',
+    'blue',
+    'magenta',
+    'cyan',
+    'crimson',
+    'white_bold'
 ];
 
 function print(arr){
@@ -24,6 +24,7 @@ function print(arr){
         table.addRow( item , { color: colors[randoColor] });
     })
     table.printTable()
+    console.log()
 }
 
 function init(){

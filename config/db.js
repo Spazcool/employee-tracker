@@ -1,4 +1,4 @@
-const connection = require('../connection.js');
+const connection = require('./connection.js');
 
 class Query {
   constructor() {
@@ -106,13 +106,7 @@ class Query {
     if(del){
       return this.connection.query(`DELETE FROM ?? WHERE id = ?;`, [table, obj.id]).catch((err)=> {
         if(err){
-          console.log(
-            `********* FORBIDDEN *********
-            Item is referenced in another item/table.
-            If item is a Manager, please update all reporting employees to another manager.
-            If item is a Role, please update all associated employees to another Role.
-            If item is a Department, please update associated Roles to another Department.`
-          );
+          console.log('********* FORBIDDEN *********\nItem is referenced in another item/table.\nIf item is a Manager, please update all reporting employees to another manager.\nIf item is a Role, please update all associated employees to another Role.\nIf item is a Department, please update associated Roles to another Department.');
         }
       });
     }

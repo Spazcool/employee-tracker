@@ -1,5 +1,5 @@
-const Query = require('./db/query.js');
-const database = new Query();
+const DB = require('./db.js');
+const database = new DB();
 
 class Questions {
 // todo add team view
