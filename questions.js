@@ -2,7 +2,7 @@ const Query = require('./db/query.js');
 const database = new Query();
 
 class Questions {
-
+// todo add team view
     showMenu(){
         return [
             {
@@ -33,11 +33,7 @@ class Questions {
                 type : 'list',
                 name : 'manager_id',
                 message : 'Manager:',
-                choices: async () => database.viewCols('employees', ['first_name', 'last_name']).then((res) => {
-                    let managers = res.map((manager) => `${manager.first_name} ${manager.last_name}`)
-                    managers.push('-- N/A --');
-                    return managers
-                })
+                choices: () => this.managerList()
             }
         ]
     }
@@ -187,11 +183,12 @@ class Questions {
         ]
     }
 // ----------- DELETE --------------
+// todo add confirmation
     deleteEmployees(){ 
         return [
             {
                 type: 'list',
-                name: 'id',
+                name: 'names',
                 message: 'Employee: ',
                 choices: () => this.employeeList()
             }
@@ -202,7 +199,7 @@ class Questions {
         return [
             {
                 type: 'list',
-                name: 'id',
+                name: 'roles',
                 message: 'Role:',
                 choices: () => this.roleList()
             }
@@ -211,10 +208,9 @@ class Questions {
 
     deleteDepartments(){
         return [
-// todo add confirmation
             {
                 type: 'list',
-                name: 'id',
+                name: 'departments',
                 message: 'Department:',
                 choices: () => this.departmentList()
             }
@@ -228,11 +224,6 @@ class Questions {
 
     validInt(int){
         return Number.isInteger(parseInt(int)) === true ? true : `Must inlude an integer value`;
-    }
-
-    validOptionalInt(int){
-        if(Number.isInteger(parseInt(int)) || int == '') return true;
-        else return 'Must be an integer value.'
     }
 
 // ----------- DB CALLS --------------

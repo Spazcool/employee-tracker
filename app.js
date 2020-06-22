@@ -1,38 +1,40 @@
 const inquirer = require('inquirer');
-// const { Table } = require('console-table-printer');
+const { Table } = require('console-table-printer');
 const Query = require('./db/query.js');
 const Questions = require('./questions.js');
-
 const database = new Query();
 const questions = new Questions();
+const colors = [
+'red',
+'green',
+'yellow',
+'white',
+'blue',
+'magenta',
+'cyan',
+'crimson',
+'white_bold'
+];
+
+function print(arr){
+    let randoColor = Math.floor(Math.random() * (colors.length));
+    const table = new Table();
+
+    arr.forEach((item) => {
+        table.addRow( item , { color: colors[randoColor] });
+    })
+    table.printTable()
+}
 
 function init(){
 // MAIN MENU / SELECT A TABLE
     inquirer.prompt(questions.showMenu())
     .then(async (answers) => {
-        if(answers.tables === 'Team'){
-            // return inquirer.prompt(questions.showTeam())
-            // .then(async (answers) => {
-
-            //     await database.viewTeam(answers.name)
-            //     .then((res) => {
-            //         console.log('\n');
-            //         console.table(res);
-            //         console.log('\n');
-            //     })
-            // })
-            // .then(() => {
-            //     init();
-            // })
-        }else{
-            await database.viewCols(answers.tables.toLowerCase(), '*')
-            .then((res) => {
-                console.log('\n');
-                console.table(res);
-                console.log('\n');
-            });
-            return answers.tables;
-        }  
+        await database.viewCols(answers.tables.toLowerCase(), '*')
+        .then((res) => {
+            print(res);
+        });
+        return answers.tables;  
     })
 // SHOW AVAILABLE ACTIONS
     .then(async (returnedTable) => {
@@ -52,13 +54,13 @@ function init(){
             .then( async (answers) => {
                 switch(obj.dbAction.toLowerCase()){
                     case 'add':
-                        await database.modRow(obj.table, answers, false);
+                        await database.modRow(obj.table, answers, false, false);
                     break;
                     case 'update':
-                        await database.modRow(obj.table, answers, true);
+                        await database.modRow(obj.table, answers, true, false);
                     break;
                     case 'delete':
-                        await database.deleteRow(obj.table, answers.id);
+                        await database.modRow(obj.table, answers, false, true);
                     break;
                     default:
                 }
@@ -71,9 +73,7 @@ function init(){
         if(obj){
             await database.viewTable(obj.table.toLowerCase())
             .then((res) => {
-                console.log('\n');
-                console.table(res);
-                console.log('\n');
+                print(res)
             });
         }
     })
